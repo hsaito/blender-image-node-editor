@@ -27,6 +27,7 @@ jobs:
                 echo "Not a version tag, skipping version extraction."
                 echo "version=0.0.0" >> $GITHUB_OUTPUT
                 exit 1
+            fi
 
       - name: Build zip package
         run: |
