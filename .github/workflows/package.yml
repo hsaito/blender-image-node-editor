@@ -1,0 +1,49 @@
+name: Package Blender Addon
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: version
+        run: |
+            if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+                version="${GITHUB_REF#refs/tags/v}"
+                echo "version=$version" >> $GITHUB_OUTPUT
+            else
+                echo "Not a version tag, skipping version extraction."
+                echo "version=0.0.0" >> $GITHUB_OUTPUT
+                exit 1
+
+      - name: Build zip package
+        run: |
+          mkdir -p dist
+          zip -r dist/batch_icon_renderer-${{ steps.version.outputs.version }}.zip \
+            icon_generator/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: batch_icon_renderer-${{ steps.version.outputs.version }}
+          path: dist/batch_icon_renderer-${{ steps.version.outputs.version }}.zip
+          retention-days: 90
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/batch_icon_renderer-${{ steps.version.outputs.version }}.zip
+          generate_release_notes: true
