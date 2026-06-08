@@ -32,7 +32,7 @@ jobs:
       - name: Build zip package
         run: |
           mkdir -p dist
-          zip -r dist/batch_icon_renderer-${{ steps.version.outputs.version }}.zip \
+          zip -r dist/image-node-editor-${{ steps.version.outputs.version }}.zip \
             "Image Node Editor"/
 
       - name: Upload artifact
